@@ -15,8 +15,8 @@
 
 
 fn main() {
-    println!("Hello and");
-    println!(r#"       welcome to...                      "#);
+    println!("Hello and"); // rust的println是个宏函数，调用时后面要加个!
+    println!(r#"       welcome to...                      "#); // r#""# 中间包围的为原始字符串字面量，特殊字符(如\)不用转义
     println!(r#"                 _   _ _                  "#);
     println!(r#"  _ __ _   _ ___| |_| (_)_ __   __ _ ___  "#);
     println!(r#" | '__| | | / __| __| | | '_ \ / _` / __| "#);
