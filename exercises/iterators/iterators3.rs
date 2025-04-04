@@ -9,8 +9,6 @@
 // Execute `rustlings hint iterators3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 #[derive(Debug, PartialEq, Eq)]
 pub enum DivisionError {
     NotDivisible(NotDivisibleError),
@@ -26,23 +24,56 @@ pub struct NotDivisibleError {
 // Calculate `a` divided by `b` if `a` is evenly divisible by `b`.
 // Otherwise, return a suitable error.
 pub fn divide(a: i32, b: i32) -> Result<i32, DivisionError> {
-    todo!();
+    if b == 0 {
+        Err(DivisionError::DivideByZero)
+    }
+    else if a % b == 0 {
+        Ok(a / b)
+    }
+    else {
+        Err(DivisionError::NotDivisible(NotDivisibleError { dividend: a, divisor: b }))
+    }
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: Ok([1, 11, 1426, 3])
-fn result_with_list() -> () {
+fn result_with_list() -> Result<Vec<i32>, DivisionError> { // 结果为Result，成功为Vec<i32>，失败为DivisionError
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    // 写法一：
+    return numbers.into_iter().map(|n| divide(n, 27)).collect::<Result<Vec<i32>, DivisionError>>();
+    /* 
+    map的结果是惰性迭代器 Iterator<Item = Result<i32, DivisionError>>，迭代器的collect方法，
+    要求其泛型参数(想要collect的结果类型)满足FromIterator trait，这里由函数返回值类型，不写的话编译器也能推导出collect的
+    泛型参数为Result<Vec<i32>, DivisionError>，那么：
+
+    Result是否实现了FromIterator trait？
+    是。
+
+    FromIterator trait的作用是什么？
+    内含from_iter方法，从iter构造自身，这里Self是Result<Vec<i32>, DivisionError>，也就是说，
+    Result<Vec<i32>, DivisionError>::from_iter(iter)，输入迭代器，返回收集后的 Result<Vec<i32>, DivisionError>。
+    
+    Result<Vec<i32>, DivisionError>::from_iter(iter)如何拿到iter？
+    Iterator的collect()方法传了self进来。因此，iterator.collect()在内部做的事为:
+    return Result<Vec<i32>, DivisionError>::from_iter(self);
+    */
+    // 于是，写法二：
+    let iter = numbers.into_iter().map(|n| divide(n, 27));
+    return Result::<Vec<i32>, DivisionError>::from_iter(iter);
+
+    // 写法三：直接unwrap出数字，collect成Vec<i32>，不借助Result::from_iter()
+    let nums = numbers.into_iter().map(|n| divide(n, 27).unwrap()).collect();
+    Ok(nums)
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: [Ok(1), Ok(11), Ok(1426), Ok(3)]
-fn list_of_results() -> () {
+fn list_of_results() -> Vec<Result<i32, DivisionError>> {
     let numbers = vec![27, 297, 38502, 81];
     let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    division_results.collect()
 }
 
 #[cfg(test)]

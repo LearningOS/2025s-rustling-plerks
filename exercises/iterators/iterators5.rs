@@ -11,8 +11,6 @@
 // Execute `rustlings hint iterators5` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::collections::HashMap;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -35,7 +33,14 @@ fn count_for(map: &HashMap<String, Progress>, value: Progress) -> usize {
 fn count_iterator(map: &HashMap<String, Progress>, value: Progress) -> usize {
     // map is a hashmap with String keys and Progress values.
     // map = { "variables1": Complete, "from_str": None, ... }
-    todo!();
+
+    /* map.values()的迭代器的元素类型是&Progress(值的引用)，filter传递参数给闭包时又会加一层引用，
+    所以lambda参数的类型为&&Progress双重引用，得两次解引用。或者.filter(|&&v| v == value)
+
+    但是.filter后面就算再套.find(|v: &&Progress| v == 2)，这个v不是三重引用，而是迭代器元素传递给
+    lambda，所以还是双重引用
+    */
+    map.values().filter(|v| **v == value).count()
 }
 
 fn count_collection_for(collection: &[HashMap<String, Progress>], value: Progress) -> usize {
@@ -54,7 +59,12 @@ fn count_collection_iterator(collection: &[HashMap<String, Progress>], value: Pr
     // collection is a slice of hashmaps.
     // collection = [{ "variables1": Complete, "from_str": None, ... },
     //     { "variables2": Complete, ... }, ... ]
-    todo!();
+    
+    collection.iter()
+              .map(|map| {
+                map.values().filter(|v| **v == value).count()
+              })
+              .sum()
 }
 
 #[cfg(test)]
