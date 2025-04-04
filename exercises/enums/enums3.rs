@@ -44,6 +44,11 @@ impl State {
         // variants
         // Remember: When passing a tuple as a function argument, you'll need
         // extra parentheses: fn function((t, u, p, l, e))
+
+        /* Message::ChangeColor, Message::Quit这几个确实是enum constructor，但是这里在match里是在匹配并解构，
+        Message::ChangeColor(r, g, b)并不是在调用constructor，而是根据enum隐藏的type_id(不一定叫这名，只是表达enum要有个隐藏字段区分enum现在具体是什么类型)，
+        去匹配enum实例的类型，并解构出变量。
+        */
         match message {
             Message::ChangeColor(r, g, b) => {
                 self.change_color((r, g, b));

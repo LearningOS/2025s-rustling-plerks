@@ -19,14 +19,20 @@
 // Execute `rustlings hint errors2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::num::ParseIntError;
 
 pub fn total_cost(item_quantity: &str) -> Result<i32, ParseIntError> {
     let processing_fee = 1;
     let cost_per_item = 5;
-    let qty = item_quantity.parse::<i32>();
+    /* let qty: Result<i32, ParseIntError> = item_quantity.parse::<i32>();
+
+    if let Result::Err(e) = qty { // 这里的e解构把qty(作为Err)移走了
+        return Err(e); // 写return Err(qty.unwrap_err());会提示qty在if let位置已经被partial move
+    }
+    Ok(qty.unwrap() * cost_per_item + processing_fee) */
+
+    // 直接这样写
+    let qty: i32 = item_quantity.parse::<i32>()?; // ?的作用是: 如果Result是Ok(value)，则解构并返回value；如果是Err(e)，直接返回Err。相当于便捷处理两种情况
 
     Ok(qty * cost_per_item + processing_fee)
 }

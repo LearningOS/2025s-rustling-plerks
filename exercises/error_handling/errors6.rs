@@ -9,8 +9,6 @@
 // Execute `rustlings hint errors6` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::num::ParseIntError;
 
 // This is a custom error type that we will be using in `parse_pos_nonzero()`.
@@ -21,18 +19,20 @@ enum ParsePosNonzeroError {
 }
 
 impl ParsePosNonzeroError {
-    fn from_creation(err: CreationError) -> ParsePosNonzeroError {
+    fn from_creation(err: CreationError) -> ParsePosNonzeroError { // 返回ParsePosNonzeroError，并告知错误原因为Creation
         ParsePosNonzeroError::Creation(err)
     }
     // TODO: add another error conversion function here.
     // fn from_parseint...
+    fn from_parseint(err: ParseIntError) -> ParsePosNonzeroError { // 返回ParsePosNonzeroError，并告知错误原因为字符串非数字
+        ParsePosNonzeroError::ParseInt(err)
+    }
 }
 
 fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
-    // TODO: change this to return an appropriate error instead of panicking
-    // when `parse()` returns an error.
-    let x: i64 = s.parse().unwrap();
-    PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from_creation)
+    // rust可以直接把函数当做值，类似javascript的“函数是一等公民”
+    let x = s.parse().map_err(ParsePosNonzeroError::from_parseint)?; // parse如果失败会返回ParseIntError，提供map函数，让其如果真的失败的话返回from_parseint()返回的结果，成功则解构转化后的值到x中
+    PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from_creation) // 编译器从new这里可知x是i64
 }
 
 // Don't change anything below this line.
@@ -46,7 +46,7 @@ enum CreationError {
     Zero,
 }
 
-impl PositiveNonzeroInteger {
+impl PositiveNonzeroInteger { // 检查一个x: i64是否 > 0, <= 0
     fn new(value: i64) -> Result<PositiveNonzeroInteger, CreationError> {
         match value {
             x if x < 0 => Err(CreationError::Negative),
